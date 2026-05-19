@@ -1,5 +1,5 @@
-const bcrypt = require("bcrypt");
-const {
+import bcrypt from "bcrypt";
+import {
   PrismaClient,
   Role,
   Sex,
@@ -14,11 +14,11 @@ const {
   TaskCategory,
   TaskPriority,
   TaskStatus,
-  MedicalRecordType,
   CharacteristicCategory,
   AssessmentType,
   AssessmentOutcome,
-} = require("@prisma/client");
+  FieldType,
+} from "@prisma/client";
 const prisma = new PrismaClient();
 
 // =================================================================//
@@ -26,13 +26,16 @@ const prisma = new PrismaClient();
 // =================================================================//
 
 // Helper function to get a random item from an array
-const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const getRandomItem = <T>(arr: T[]): T => {
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
 // Helper function to generate random dates between 2023 and now
 function getRandomDate() {
   const start = new Date(2023, 0, 1);
   const end = new Date();
   return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
   );
 }
 
@@ -222,10 +225,7 @@ const animalSeedData = [
     intakeType: IntakeType.OWNER_SURRENDER,
     healthStatus: AnimalHealthStatus.HEALTHY,
     legalStatus: AnimalLegalStatus.NONE,
-    images: [
-      "/uploads/dog1.jpg",
-      "/uploads/dog1-1.webp",
-    ],
+    images: ["/uploads/dog1.jpg", "/uploads/dog1-1.webp"],
   },
   {
     name: "Flash",
@@ -254,10 +254,7 @@ const animalSeedData = [
     intakeType: IntakeType.TRANSFER_IN,
     healthStatus: AnimalHealthStatus.UNDER_VET_CARE,
     legalStatus: AnimalLegalStatus.NONE,
-    images: [
-      "/uploads/dog3.jpg",
-      "/uploads/dog3-1.jpg",
-    ],
+    images: ["/uploads/dog3.jpg", "/uploads/dog3-1.jpg"],
   },
   {
     name: "Whiskers",
@@ -324,7 +321,7 @@ const animalSeedData = [
     intakeType: IntakeType.STRAY,
     healthStatus: AnimalHealthStatus.HEALTHY,
     legalStatus: AnimalLegalStatus.STRAY_HOLD,
-    images: ["/uploads/dog3-2.webp"]
+    images: ["/uploads/dog3-2.webp"],
   },
   {
     name: "Leo",
@@ -386,7 +383,23 @@ const taskSeedData = [
   },
 ];
 
-const assessmentTemplateSeedData = [
+interface SeedTemplateField {
+  label: string;
+  fieldType: FieldType;
+  placeholder?: string;
+  options?: string[];
+  order: number;
+}
+
+interface SeedAssessmentTemplate {
+  name: string;
+  type: AssessmentType;
+  description: string;
+  allowCustomFields: boolean;
+  fields: SeedTemplateField[];
+}
+
+const assessmentTemplateSeedData: SeedAssessmentTemplate[] = [
   {
     name: "Intake Behavioral",
     type: AssessmentType.INTAKE_BEHAVIORAL,
@@ -541,7 +554,7 @@ async function seedPersonsAndUsers() {
         email: pData.email,
       },
     });
-    
+
     if (pData.role) {
       let passwordToHash = "password123"; // Default password for non-admin users
 
@@ -557,7 +570,7 @@ async function seedPersonsAndUsers() {
           password: hashedPassword,
           role: pData.role,
           person: { connect: { id: person.id } },
-        }
+        },
       });
     }
   }
@@ -652,7 +665,7 @@ async function seedAnimalsAndRelations() {
 
   if (staffMembers.length === 0) {
     throw new Error(
-      "No staff members found. Please ensure staff are seeded before animals."
+      "No staff members found. Please ensure staff are seeded before animals.",
     );
   }
 
@@ -662,7 +675,7 @@ async function seedAnimalsAndRelations() {
       const species = dbSpecies.find((s) => s.name === animalData.species.name);
       if (!species) {
         console.warn(
-          `Skipping animal "${animalData.name}" because its species "${animalData.species.name}" was not found.`
+          `Skipping animal "${animalData.name}" because its species "${animalData.species.name}" was not found.`,
         );
         continue;
       }
@@ -709,7 +722,14 @@ async function seedAnimalsAndRelations() {
       });
 
       // --- Always create an intake record for the new animal ---
-      const intakeData = {
+      const intakeData: {
+        animalId: string;
+        type: IntakeType;
+        staffMemberId: string;
+        surrenderingPersonId?: string;
+        foundByPersonId?: string;
+        sourcePartnerId?: string;
+      } = {
         animalId: animal.id,
         type: animalData.intakeType,
         staffMemberId: processingStaff.id,
@@ -807,7 +827,7 @@ async function seedAssessments() {
 
     if (!staffMembers.length || !animals.length || !templates.length) {
       console.log(
-        "No staff, animals, or templates found, skipping assessment seeding."
+        "No staff, animals, or templates found, skipping assessment seeding.",
       );
       return;
     }
@@ -815,7 +835,7 @@ async function seedAssessments() {
     for (const assessmentData of assessmentSeedData) {
       // Find the template that matches the assessment's template name
       const relatedTemplate = templates.find(
-        (t) => t.name === assessmentData.templateName
+        (t) => t.name === assessmentData.templateName,
       );
 
       await prisma.assessment.create({

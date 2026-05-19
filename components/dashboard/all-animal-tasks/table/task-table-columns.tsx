@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { AllAnimalsTasksPayload } from "@/app/lib/data/all-animal-tasks.data";
 
-interface GetColumnsProps {
+export interface GetColumnsProps {
   assigneeList: TaskAssignee[];
 }
 

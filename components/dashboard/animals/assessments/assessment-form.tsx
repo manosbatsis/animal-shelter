@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, startTransition, useMemo, useCallback } from "react";
-import { useForm, Controller } from "react-hook-form";
+import React, {
+  useState,
+  useEffect,
+  startTransition,
+  useMemo,
+  useCallback,
+} from "react";
+import { useForm, Controller, Control, FieldValues } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FieldType, AssessmentType } from "@prisma/client";
 import { Loader2 } from "lucide-react";
@@ -60,7 +66,7 @@ export function AssessmentForm({
 
   const [state, formAction, isPending] = useActionState(
     action,
-    INITIAL_FORM_STATE
+    INITIAL_FORM_STATE,
   );
 
   const [selectedTemplate, setSelectedTemplate] =
@@ -79,45 +85,48 @@ export function AssessmentForm({
     return selectedTemplate ? selectedTemplate.templateFields : [];
   }, [selectedTemplate]);
 
-  const generateDefaultValues = useCallback((
-    fields: TemplateField[],
-    currentAssessment?: AnimalAssessmentFormPayload
-) => {
-    const defaultVals: { [key: string]: any } = {};
+  const generateDefaultValues = useCallback(
+    (
+      fields: TemplateField[],
+      currentAssessment?: AnimalAssessmentFormPayload,
+    ): Record<string, unknown> => {
+      const defaultVals: Record<string, unknown> = {};
 
-    if (currentAssessment) {
-      // Edit mode: Populate with existing data
-      defaultVals.overallOutcome = currentAssessment.overallOutcome || "";
-      defaultVals.summary = currentAssessment.summary || "";
-      currentAssessment.fields.forEach((savedField) => {
-        const templateField = fields.find(
-          (f) => f.label === savedField.fieldName
-        );
-        if (templateField) {
-          let value: any = savedField.fieldValue;
-          if (templateField.fieldType === FieldType.NUMBER) {
-            value = value !== null ? Number(value) : "";
-          } else if (templateField.fieldType === FieldType.CHECKBOX) {
-            value = value === "true";
+      if (currentAssessment) {
+        // Edit mode: Populate with existing data
+        defaultVals.overallOutcome = currentAssessment.overallOutcome || "";
+        defaultVals.summary = currentAssessment.summary || "";
+        currentAssessment.fields.forEach((savedField) => {
+          const templateField = fields.find(
+            (f) => f.label === savedField.fieldName,
+          );
+          if (templateField) {
+            let value: unknown = savedField.fieldValue;
+            if (templateField.fieldType === FieldType.NUMBER) {
+              value = value !== null ? Number(value) : "";
+            } else if (templateField.fieldType === FieldType.CHECKBOX) {
+              value = value === "true";
+            }
+            defaultVals[templateField.id] = value;
+            defaultVals[`${templateField.id}_notes`] = savedField.notes || "";
           }
-          defaultVals[templateField.id] = value;
-          defaultVals[`${templateField.id}_notes`] = savedField.notes || "";
-        }
-      });
-    } else {
-      // Create mode: Set empty defaults
-      defaultVals.overallOutcome = "";
-      defaultVals.summary = "";
-      fields.forEach((field) => {
-        defaultVals[field.id] =
-          field.fieldType === FieldType.CHECKBOX ? false : "";
-        defaultVals[`${field.id}_notes`] = "";
-      });
-    }
-    return defaultVals;
-  }, []);
+        });
+      } else {
+        // Create mode: Set empty defaults
+        defaultVals.overallOutcome = "";
+        defaultVals.summary = "";
+        fields.forEach((field) => {
+          defaultVals[field.id] =
+            field.fieldType === FieldType.CHECKBOX ? false : "";
+          defaultVals[`${field.id}_notes`] = "";
+        });
+      }
+      return defaultVals;
+    },
+    [],
+  );
 
-  const form = useForm<any>({
+  const form = useForm<Record<string, unknown>>({
     resolver: zodResolver(createDynamicSchema(allFields)),
     defaultValues: generateDefaultValues(allFields, assessment),
   });
@@ -138,7 +147,10 @@ export function AssessmentForm({
     if (state.errors) {
       for (const [key, value] of Object.entries(state.errors)) {
         if (value) {
-          setError(key as any, { type: "server", message: value.join(", ") });
+          setError(key as Parameters<typeof setError>[0], {
+            type: "server",
+            message: value.join(", "),
+          });
         }
       }
     }
@@ -151,7 +163,7 @@ export function AssessmentForm({
     }
   };
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: Record<string, unknown>) => {
     if (!selectedTemplate) return;
 
     const formData = new FormData();
@@ -217,7 +229,10 @@ export function AssessmentForm({
           {allFields.map((field) => (
             <React.Fragment key={field.id}>
               <div className="md:col-span-2">
-                <DynamicFormField field={field} control={form.control} />
+                <DynamicFormField
+                  field={field}
+                  control={form.control as Control<FieldValues>}
+                />
               </div>
               <div className="md:col-span-4">
                 {field.fieldType !== FieldType.CHECKBOX && (
@@ -230,7 +245,7 @@ export function AssessmentForm({
                 )}
                 <Controller
                   name={`${field.id}_notes`}
-                  control={control}
+                  control={control as Control<FieldValues>}
                   render={({ field: controllerField }) => (
                     <Input
                       {...controllerField}
@@ -255,7 +270,7 @@ export function AssessmentForm({
                 order: 999,
                 placeholder: "Select an outcome",
               }}
-              control={form.control}
+              control={form.control as Control<FieldValues>}
             />
           </div>
 
@@ -270,7 +285,7 @@ export function AssessmentForm({
                 options: [],
                 order: 1000,
               }}
-              control={form.control}
+              control={form.control as Control<FieldValues>}
             />
           </div>
 
@@ -292,8 +307,8 @@ export function AssessmentForm({
                   ? "Updating..."
                   : "Creating..."
                 : isEditMode
-                ? "Update Assessment"
-                : "Create Assessment"}
+                  ? "Update Assessment"
+                  : "Create Assessment"}
             </Button>
           </div>
         </div>

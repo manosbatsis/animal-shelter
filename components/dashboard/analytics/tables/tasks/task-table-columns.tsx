@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import { TaskAnalyticsPayload } from "@/app/lib/data/analytics.data";
 
-interface GetColumnsProps {
+export interface GetColumnsProps {
   assigneeList: TaskAssignee[];
 }
 

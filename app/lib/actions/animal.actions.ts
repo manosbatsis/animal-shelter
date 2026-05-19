@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
+import { z } from "zod";
 import { cuidSchema } from "../zod-schemas/common.schemas";
 import { AnimalFormSchema } from "../zod-schemas/animal.schemas";
 import { AnimalFormState } from "../form-state-types";
@@ -43,7 +44,7 @@ const _createAnimal = async (
 
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       message: "Missing or invalid fields. Failed to create intake record.",
     };
   }
@@ -205,7 +206,7 @@ const _updateAnimal = async (
 
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       message: "Missing or invalid fields. Failed to update animal.",
     };
   }
@@ -225,7 +226,6 @@ const _updateAnimal = async (
     heightCm,
     city,
     state,
-    notes,
   } = validatedFields.data;
 
   // This guard prevents archiving from the intake form.

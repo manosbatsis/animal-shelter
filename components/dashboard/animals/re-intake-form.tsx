@@ -1,11 +1,7 @@
 "use client";
 
 import { createReIntake } from "@/app/lib/actions/intake.actions";
-import {
-  startTransition,
-  useActionState,
-  useEffect,
-} from "react";
+import { startTransition, useActionState, useEffect } from "react";
 import { INITIAL_FORM_STATE } from "@/app/lib/form-state-types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -41,6 +37,8 @@ import { AnimalReIntakeFormPayload, PartnerPayload } from "@/app/lib/types";
 import Link from "next/link";
 import { IntakeFormFields } from "./intake-form-fields";
 import { ReIntakeFormSchema } from "@/app/lib/zod-schemas/intake.schema";
+import { IntakeFieldsValues } from "@/app/lib/zod-schemas/intake.schema";
+import { Control, UseFormWatch } from "react-hook-form";
 
 type ReIntakeFormValues = z.infer<typeof ReIntakeFormSchema>;
 
@@ -54,7 +52,7 @@ const ReIntakeForm = ({ animal, partners }: ReIntakeFormProps) => {
 
   const [state, formAction, isPending] = useActionState(
     action,
-    INITIAL_FORM_STATE
+    INITIAL_FORM_STATE,
   );
 
   const form = useForm({
@@ -117,7 +115,9 @@ const ReIntakeForm = ({ animal, partners }: ReIntakeFormProps) => {
           <CardContent className="space-y-10">
             {/* Health Status Selection */}
             <div className="space-y-6">
-              <h3 className="font-semibold border-b pb-2">Current Health Status</h3>
+              <h3 className="font-semibold border-b pb-2">
+                Current Health Status
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -150,9 +150,15 @@ const ReIntakeForm = ({ animal, partners }: ReIntakeFormProps) => {
             </div>
 
             {/* Intake Fields Component */}
-            <IntakeFormFields
+            {/* <IntakeFormFields
               control={form.control}
               watch={form.watch}
+              partners={partners}
+              isEditMode={false}
+            /> */}
+            <IntakeFormFields
+              control={form.control as unknown as Control<IntakeFieldsValues>}
+              watch={form.watch as unknown as UseFormWatch<IntakeFieldsValues>}
               partners={partners}
               isEditMode={false}
             />

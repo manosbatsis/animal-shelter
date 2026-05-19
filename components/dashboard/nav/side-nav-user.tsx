@@ -3,7 +3,6 @@
 import type { Session } from "next-auth"
 import { signOut } from "next-auth/react"
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
   IconNotification,
@@ -30,7 +29,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 
 export function NavUser({ user }: { user: Session["user"] }) {
   const { isMobile } = useSidebar()

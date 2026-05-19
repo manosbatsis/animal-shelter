@@ -29,10 +29,11 @@ import { intakeTypeOptions } from "@/app/lib/utils/enum-formatter";
 import { US_STATES } from "@/app/lib/constants/us-states";
 import { PartnerPayload } from "@/app/lib/types";
 import { Control, UseFormWatch } from "react-hook-form";
+import { IntakeFieldsValues } from "@/app/lib/zod-schemas/intake.schema";
 
 interface IntakeFormFieldsProps {
-  control: Control<any>;
-  watch: UseFormWatch<any>;
+  control: Control<IntakeFieldsValues>;
+  watch: UseFormWatch<IntakeFieldsValues>;
   partners: PartnerPayload[];
   isEditMode?: boolean;
 }

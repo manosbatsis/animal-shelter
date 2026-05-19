@@ -28,14 +28,13 @@
   body {
     @apply bg-background text-foreground;
   }
-  
 
   /* This is a workaround to enable cursor-pointer for button elements */
   /* button:not([disabled]),
   [role="button"]:not([disabled]) {
     cursor: pointer;
   } */
-   
+
 }
 
 /* @utility text-balance {

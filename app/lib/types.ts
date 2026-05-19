@@ -1,4 +1,4 @@
-import { AdoptionApplication, Animal, AssessmentOutcome, AssessmentType, Breed, Color, FieldType, Intake, Like, Prisma, Species, Task } from "@prisma/client";
+import { FieldType, Prisma } from "@prisma/client";
 
 export type SearchParamsType = Promise<{ [key: string]: string | undefined }>;
 export type IDParamType = Promise<{ id: string }>;
@@ -304,11 +304,11 @@ export interface TemplateField {
   order: number;
 }
 
-export interface AssessmentFormData {
-  animalId: string;
-  templateId: string;
-  overallOutcome?: AssessmentOutcome;
-  summary?: string;
-  customFields?: TemplateField[];
-  [key: string]: any; // For dynamic field values
-}
+// export interface AssessmentFormData {
+//   animalId: string;
+//   templateId: string;
+//   overallOutcome?: AssessmentOutcome;
+//   summary?: string;
+//   customFields?: TemplateField[];
+//   [key: string]: any; // For dynamic field values
+// }

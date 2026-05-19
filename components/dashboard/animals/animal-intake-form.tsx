@@ -12,7 +12,6 @@ import {
   INITIAL_FORM_STATE,
   AnimalFormState,
 } from "@/app/lib/form-state-types";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -70,6 +69,8 @@ import {
 } from "@/app/lib/types";
 import Link from "next/link";
 import { IntakeFormFields } from "./intake-form-fields";
+import { IntakeFieldsValues } from "@/app/lib/zod-schemas/intake.schema";
+import { Control, UseFormWatch } from "react-hook-form";
 
 type AnimalFormValues = z.infer<typeof AnimalFormSchema>;
 
@@ -97,18 +98,18 @@ const AnimalForm = ({
       return animalListingStatusOptions.filter(
         (opt) =>
           opt.value === AnimalListingStatus.DRAFT ||
-          opt.value === AnimalListingStatus.PUBLISHED
+          opt.value === AnimalListingStatus.PUBLISHED,
       );
     }
     if (isStatusLocked) {
       return animalListingStatusOptions.filter(
-        (opt) => opt.value === animal.listingStatus
+        (opt) => opt.value === animal.listingStatus,
       );
     }
     return animalListingStatusOptions.filter(
       (opt) =>
         opt.value === AnimalListingStatus.DRAFT ||
-        opt.value === AnimalListingStatus.PUBLISHED
+        opt.value === AnimalListingStatus.PUBLISHED,
     );
   }, [isEditMode, isStatusLocked, animal]);
 
@@ -119,7 +120,7 @@ const AnimalForm = ({
     FormData
   >(action, INITIAL_FORM_STATE);
   const [currentSpeciesId, setCurrentSpeciesId] = useState(
-    animal?.speciesId || ""
+    animal?.speciesId || "",
   );
 
   const form = useForm({
@@ -366,7 +367,7 @@ const AnimalForm = ({
                                 variant={"outline"}
                                 className={cn(
                                   "w-full pl-3 text-left font-normal",
-                                  !dateValue && "text-muted-foreground"
+                                  !dateValue && "text-muted-foreground",
                                 )}
                               >
                                 {dateValue ? (
@@ -593,11 +594,19 @@ const AnimalForm = ({
             {/* Intake Section - Only show on CREATE mode */}
             {!isEditMode && (
               <IntakeFormFields
-                control={form.control}
-                watch={form.watch}
+                control={form.control as unknown as Control<IntakeFieldsValues>}
+                watch={
+                  form.watch as unknown as UseFormWatch<IntakeFieldsValues>
+                }
                 partners={partners}
                 isEditMode={false}
               />
+              // <IntakeFormFields
+              //   control={form.control}
+              //   watch={form.watch}
+              //   partners={partners}
+              //   isEditMode={false}
+              // />
             )}
           </CardContent>
 
@@ -617,8 +626,8 @@ const AnimalForm = ({
                   ? "Updating..."
                   : "Submitting..."
                 : isEditMode
-                ? "Save Changes"
-                : "Create Intake"}
+                  ? "Save Changes"
+                  : "Create Intake"}
             </Button>
           </CardFooter>
         </Card>

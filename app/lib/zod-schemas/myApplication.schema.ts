@@ -1,45 +1,6 @@
 import { z } from "zod";
 import { LivingSituation } from "@prisma/client";
 
-// Helper schema to parse "true", "false", or "" from radio button groups.
-// It expects one of these values. If the input is `null` (no radio selected)
-// or `undefined` (field not in FormData), it will result in a validation error.
-// Now, it only expects "true" or "false", and the selection is mandatory.
-const RequiredBooleanRadioSelectionSchema = (errorMessage: string) =>
-  z
-    .enum(["true", "false"], {
-      // This error message is used if the value is not one of "true", "false",
-      // or if the value is `null` or `undefined` (because it's not in the enum).
-      // For "true" or "false" enum, this makes the selection required.
-      error: (issue) => errorMessage,
-    })
-    .transform((val) => val === "true"); // Transforms "true" to true, "false" to false
-
-// Helper schema to parse a comma-separated string of ages into an array of numbers.
-const CommaSeparatedAgesSchema = z
-  .string() // Explicitly define the input as a string
-  .transform((val, ctx) => {
-    if (val.trim() === "") {
-      return []; // Return an empty array for an empty string
-    }
-    const parts = val.split(",").map((s) => s.trim());
-    const numbers: number[] = [];
-
-    for (const part of parts) {
-      if (part === "") continue; // Allows for trailing commas, etc.
-      const num = Number(part);
-      if (isNaN(num) || !Number.isInteger(num) || num < 0) {
-        ctx.addIssue({
-          code: "custom",
-          message: `Each age must be a valid positive number.`,
-        });
-        return z.NEVER; // Stop processing on invalid input
-      }
-      numbers.push(num);
-    }
-    return numbers;
-  });
-
 // Define the Zod schema for the adoption application form
 export const MyAdoptionAppFormSchema = z
   .object({

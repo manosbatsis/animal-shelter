@@ -44,13 +44,7 @@ const chartConfig = {
 
 export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
   const isMobile = useIsMobile();
-  const [timeRange, setTimeRange] = React.useState("90d");
-
-  React.useEffect(() => {
-    if (isMobile) {
-      setTimeRange("30d");
-    }
-  }, [isMobile]);
+  const [timeRange, setTimeRange] = React.useState(() => isMobile ? "30d" : "90d");
 
   // Filter the data on the client-side based on the selected time range.
   const filteredData = React.useMemo(() => {

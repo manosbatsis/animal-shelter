@@ -8,7 +8,6 @@ import {
 } from "@prisma/client";
 import { Permissions } from "@/app/lib/auth/permissions";
 import { RequirePermission } from "../auth/protected-actions";
-import { FetchAnimalTasksPayload } from "./animals/animal-task.data";
 import { Prettify } from "../utils/type-utils";
 
 export type PetCardDataType = {

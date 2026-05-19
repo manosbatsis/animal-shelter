@@ -9,6 +9,7 @@ import { AnimalListingStatus, ApplicationStatus } from "@prisma/client";
 import { MyAdoptionAppFormSchema } from "../zod-schemas/myApplication.schema";
 import { SessionUser, withAuthenticatedUser } from "../auth/protected-actions";
 import { ActionResult } from "../types";
+import { z } from "zod";
 
 const _updateMyAdoptionApp = async (
   user: SessionUser, // Injected by withAuthenticatedUser
@@ -92,30 +93,18 @@ const _updateMyAdoptionApp = async (
   // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       message: "Missing Fields. Failed to Update Adoption Application.",
     };
   }
 
   // Prepare data for insertion into the database
   const {
-    applicantName,
-    applicantEmail,
-    applicantPhone,
-    applicantAddressLine1,
-    applicantAddressLine2,
-    applicantCity,
-    applicantState,
-    applicantZipCode,
-    livingSituation,
     hasYard,
     landlordPermission,
     householdSize,
     hasChildren,
     childrenAges,
-    otherAnimalsDescription,
-    animalExperience,
-    reasonForAdoption,
   } = validatedFields.data;
 
   const dataToUpdate = {
@@ -392,29 +381,17 @@ const _createMyAdoptionApp = async (
 
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
+      errors: z.flattenError(validatedFields.error).fieldErrors,
       message: "Missing Fields. Failed to Submit Application.",
     };
   }
 
   const {
-    applicantName,
-    applicantEmail,
-    applicantPhone,
-    applicantAddressLine1,
-    applicantAddressLine2,
-    applicantCity,
-    applicantState,
-    applicantZipCode,
-    livingSituation,
     hasYard,
     landlordPermission,
     householdSize,
     hasChildren,
     childrenAges,
-    otherAnimalsDescription,
-    animalExperience,
-    reasonForAdoption,
   } = validatedFields.data;
 
   const dataToCreate = {

@@ -54,8 +54,7 @@ const _updateAnimalCharacteristics = async (data: {
     }
 
     // Start a transaction to ensure atomicity
-    const result = await prisma.$transaction(async (tx) => {
-      // Fetch the animal and its current characteristics
+    await prisma.$transaction(async (tx) => {
       const animal = await tx.animal.findUnique({
         where: { id: animalId },
         select: {
@@ -64,27 +63,16 @@ const _updateAnimalCharacteristics = async (data: {
           },
         },
       });
-
       if (!animal) {
-        return {
-          success: false,
-          message: "Animal not found.",
-        };
+        throw new Error("Animal not found.");
       }
-
       const currentIds = new Set(animal.characteristics.map((c) => c.id));
-
-      // Determine which characteristics to add (connect) and remove (disconnect)
       const toConnect = characteristicIds
         .filter((id) => !currentIds.has(id))
         .map((id) => ({ id }));
-
       const toDisconnect = Array.from(currentIds)
         .filter((id) => !newIds.has(id))
         .map((id) => ({ id }));
-
-      // Perform the update in a single operation
-      // The Animal-Characteristic relationship is many-to-many
       await tx.animal.update({
         where: { id: animalId },
         data: {
@@ -113,5 +101,5 @@ const _updateAnimalCharacteristics = async (data: {
 };
 
 export const updateAnimalCharacteristics = RequirePermission(
-  Permissions.ANIMAL_CHARACTERISTICS_UPDATE
+  Permissions.ANIMAL_CHARACTERISTICS_UPDATE,
 )(_updateAnimalCharacteristics);

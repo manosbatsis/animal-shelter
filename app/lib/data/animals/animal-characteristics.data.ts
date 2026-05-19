@@ -4,7 +4,7 @@ import { cuidSchema } from "../../zod-schemas/common.schemas";
 import { RequirePermission } from "../../auth/protected-actions";
 import { Permissions } from "@/app/lib/auth/permissions";
 
-export type CharacteristicWithAssignment = Prisma.CharacteristicGetPayload<{}> & {
+export type CharacteristicWithAssignment = Prisma.CharacteristicGetPayload<object> & {
   isAssigned: boolean;
 };
 

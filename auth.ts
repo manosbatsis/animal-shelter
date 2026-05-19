@@ -3,12 +3,14 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/app/lib/prisma";
 import { z } from "zod";
 import { type DefaultSession } from "next-auth";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { authProviderConfigList } from "./auth.config";
-import { Role } from "@prisma/client"; // Import the Role enum
+import type { AdapterUser } from "@auth/core/adapters";
+import { Role } from "@prisma/client";
 
 // declare custom user properties
 declare module "next-auth" {
@@ -66,13 +68,13 @@ const getUser = async (email: string): Promise<User | null> => {
 const CustomPrismaAdapter = (p: typeof prisma) => {
   return {
     ...PrismaAdapter(p),
-    createUser: async (data: any) => {
+    createUser: async (data: Omit<AdapterUser, "id">) => {
       // Use a transaction to ensure both Person and User are created successfully
       const user = await p.$transaction(async (tx) => {
         // Create the Person record first
         const person = await tx.person.create({
           data: {
-            name: data.name,
+            name: data.name ?? "",
             email: data.email,
           },
         });
@@ -144,7 +146,7 @@ const credentialsConfig = Credentials({
 export const authConfig = {
   adapter: CustomPrismaAdapter(prisma),
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user: _user }) {
       // If the token already has the data, just return it.
       if (token.personId) {
         return token;

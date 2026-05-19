@@ -5,7 +5,7 @@ import { ApplicationStatus } from "@prisma/client";
 import { ArrowRight, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { startTransition, useActionState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ApplicationWithOutcome } from "@/app/lib/data/user-application.data";
@@ -107,7 +107,7 @@ export function StaffApplicationUpdateForm({
   });
 
   const currentStatus = application.status;
-  const newStatus = form.watch("status");
+  const newStatus = useWatch({ control: form.control, name: "status" });
   const isStatusChanging = newStatus && newStatus !== currentStatus;
 
   useEffect(() => {

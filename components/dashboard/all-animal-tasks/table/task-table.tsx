@@ -19,11 +19,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { GetColumnsProps } from "@/components/dashboard/all-animal-tasks/table/task-table-columns";
 import { TaskAssignee } from "@/app/lib/types";
 import { DataTablePagination } from "@/components/table-common/data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
-  getColumns: (props: any) => ColumnDef<TData, TValue>[];
+  getColumns: (props: GetColumnsProps) => ColumnDef<TData, TValue>[];
   data: TData[];
   ToolbarComponent?: React.ComponentType<{
     table: Table<TData>;

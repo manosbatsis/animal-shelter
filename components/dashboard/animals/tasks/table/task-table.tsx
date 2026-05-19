@@ -21,9 +21,10 @@ import {
 } from "@/components/ui/table";
 import { TaskAssignee } from "@/app/lib/types";
 import { DataTablePagination } from "@/components/table-common/data-table-pagination";
+import { GetColumnsProps } from "./task-table-columns";
 
 interface DataTableProps<TData, TValue> {
-  getColumns: (props: any) => ColumnDef<TData, TValue>[];
+  getColumns: (props: GetColumnsProps) => ColumnDef<TData, TValue>[];
   data: TData[];
   ToolbarComponent?: React.ComponentType<{
     table: Table<TData>;

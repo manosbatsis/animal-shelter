@@ -109,35 +109,37 @@ const AnimalCharacteristicsManager = ({
       new Set(
         animalCharacteristics
           .filter((char) => char.isAssigned)
-          .map((char) => char.id)
+          .map((char) => char.id),
       ),
-    [animalCharacteristics]
+    [animalCharacteristics],
   );
 
   // Use stagedChanges if dialog is open, otherwise use initial data
-  const activeIds = isDialogOpen ? stagedChanges : initialAssignedIds;
 
   const assignedCharacteristics = useMemo(
-    () => animalCharacteristics.filter((char) => activeIds.has(char.id)),
-    [animalCharacteristics, activeIds]
+    () => animalCharacteristics.filter((char) => stagedChanges.has(char.id)),
+    [animalCharacteristics, stagedChanges],
   );
 
   const savedGroupedCharacteristics = useMemo(() => {
     const savedChars = animalCharacteristics.filter((char) =>
-      initialAssignedIds.has(char.id)
+      initialAssignedIds.has(char.id),
     );
     return savedChars.reduce<
       Record<CharacteristicCategory, CharacteristicWithAssignment[]>
-    >((acc, char) => {
-      const categoryKey = char.category;
-      (acc[categoryKey] = acc[categoryKey] || []).push(char);
-      return acc;
-    }, {} as Record<CharacteristicCategory, CharacteristicWithAssignment[]>);
+    >(
+      (acc, char) => {
+        const categoryKey = char.category;
+        (acc[categoryKey] = acc[categoryKey] || []).push(char);
+        return acc;
+      },
+      {} as Record<CharacteristicCategory, CharacteristicWithAssignment[]>,
+    );
   }, [animalCharacteristics, initialAssignedIds]);
 
   const availableForAdding = useMemo(
     () => animalCharacteristics.filter((char) => !stagedChanges.has(char.id)),
-    [animalCharacteristics, stagedChanges]
+    [animalCharacteristics, stagedChanges],
   );
 
   const handleOpenDialog = useCallback(() => {
@@ -159,8 +161,9 @@ const AnimalCharacteristicsManager = ({
 
       if (result.success) {
         toast.success(
-          result.message || "Characteristics updated successfully!"
+          result.message || "Characteristics updated successfully!",
         );
+        setStagedChanges(new Set());
         setIsDialogOpen(false);
       } else {
         toast.error(result.message || "An unexpected error occurred.");
@@ -174,7 +177,7 @@ const AnimalCharacteristicsManager = ({
       newStagedChanges.delete(charId);
       setStagedChanges(newStagedChanges);
     },
-    [stagedChanges]
+    [stagedChanges],
   );
 
   const handleTagAdd = useCallback(
@@ -184,11 +187,18 @@ const AnimalCharacteristicsManager = ({
       setStagedChanges(newStagedChanges);
       setOpenCombobox(false);
     },
-    [stagedChanges]
+    [stagedChanges],
   );
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        if (isPending) return; // block close during save
+        if (!open) handleCancel();
+        else handleOpenDialog();
+      }}
+    >
       <Card className="w-full mx-auto">
         <CardHeader className="relative">
           <CardTitle>Characteristics</CardTitle>
@@ -225,7 +235,7 @@ const AnimalCharacteristicsManager = ({
                           variant="secondary"
                           className={clsx(
                             "font-normal text-sm py-1 px-2.5",
-                            CATEGORIES[char.category]?.color
+                            CATEGORIES[char.category]?.color,
                           )}
                         >
                           {char.name}
@@ -276,7 +286,7 @@ const AnimalCharacteristicsManager = ({
                   variant="secondary"
                   className={clsx(
                     "flex items-center gap-1.5 py-1",
-                    CATEGORIES[char.category]?.color
+                    CATEGORIES[char.category]?.color,
                   )}
                 >
                   <span>{char.name}</span>

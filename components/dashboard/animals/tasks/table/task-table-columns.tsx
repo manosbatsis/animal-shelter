@@ -19,7 +19,7 @@ import {
 import { toast } from "sonner";
 import { updateAnimalTaskAssignee } from "@/app/lib/actions/animal-task.actions";
 
-interface GetColumnsProps {
+export interface GetColumnsProps {
   animalId: string;
   assigneeList: TaskAssignee[];
 }

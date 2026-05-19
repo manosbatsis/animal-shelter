@@ -1,5 +1,4 @@
-import React from "react";
-import { Control } from "react-hook-form";
+import { Control, ControllerRenderProps, FieldValues, Path } from "react-hook-form";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 
@@ -37,13 +36,13 @@ import { FieldType } from "@prisma/client";
 
 interface DynamicFormFieldProps {
   field: TemplateField;
-  control: Control<any>;
+  control: Control<FieldValues>;
 }
 
 type Option = string | { value: string; label: string };
 
 export function DynamicFormField({ field, control }: DynamicFormFieldProps) {
-  const renderInput = (controllerField: any) => {
+  const renderInput = (controllerField: ControllerRenderProps<FieldValues, Path<FieldValues>>) => {
     switch (field.fieldType) {
       case FieldType.TEXT:
         return (

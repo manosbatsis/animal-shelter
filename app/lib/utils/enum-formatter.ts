@@ -42,7 +42,7 @@ function formatEnumForDisplay<T extends string>(enumObject: {
 function formatEnumAsOptions<T extends string>(enumObject: {
   [key: string]: T;
 }): { value: T; label: string }[] {
-  return Object.entries(enumObject).map(([key, value]) => ({
+  return Object.entries(enumObject).map(([_key, value]) => ({
     value: value, // Use the raw enum value as the value for consistency with how Prisma stores it
     label: value // Use the raw enum value for formatting
       .split("_")

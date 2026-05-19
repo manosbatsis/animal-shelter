@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface IconProps extends React.SVGProps<SVGSVGElement> {}
+type IconProps = React.SVGProps<SVGSVGElement>;
 
 export const FacebookIcon = (props: IconProps) => {
   return (

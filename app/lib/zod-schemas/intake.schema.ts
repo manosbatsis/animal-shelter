@@ -67,3 +67,17 @@ export const ReIntakeFormSchema = z
       }
     }
   });
+
+export const IntakeFieldsSchema = z.object({
+  intakeType: z.enum(IntakeType).optional(),
+  intakeDate: z.coerce.date().optional(),
+  notes: z.string().optional(),
+  sourcePartnerId: z.string().optional(),
+  foundAddress: z.string().optional(),
+  foundCity: z.string().optional(),
+  foundState: z.string().optional(),
+  surrenderingPersonName: z.string().optional(),
+  surrenderingPersonPhone: z.string().optional(),
+});
+
+export type IntakeFieldsValues = z.infer<typeof IntakeFieldsSchema>;

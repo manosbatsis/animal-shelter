@@ -18,6 +18,7 @@ import {
   AssessmentType,
   AssessmentOutcome,
   FieldType,
+  OutcomeType,
 } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -31,12 +32,31 @@ const getRandomItem = <T>(arr: T[]): T => {
 };
 
 // Helper function to generate random dates between 2023 and now
-function getRandomDate() {
-  const start = new Date(2023, 0, 1);
+function getRandomDate(yearsBack = 3): Date {
   const end = new Date();
+  const start = new Date(
+    end.getFullYear() - yearsBack,
+    end.getMonth(),
+    end.getDate(),
+  );
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime()),
   );
+}
+
+// Generates a random date within the last N days from today (UTC)
+function getRandomDateWithinLastDays(maxDaysAgo: number, minDaysAgo = 1): Date {
+  const now = new Date();
+  const daysAgo =
+    Math.floor(Math.random() * (maxDaysAgo - minDaysAgo + 1)) + minDaysAgo;
+  const date = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() - daysAgo,
+    ),
+  );
+  return date;
 }
 
 const personData = [
@@ -361,7 +381,8 @@ const taskSeedData = [
     status: TaskStatus.TODO,
     priority: TaskPriority.HIGH,
     category: TaskCategory.MEDICAL,
-    dueDate: new Date("2025-07-11T18:30:00.000Z"),
+    // 5 days from now
+    dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
   },
   {
     title: "Behavioral assessment for new dog",
@@ -370,7 +391,8 @@ const taskSeedData = [
     status: TaskStatus.IN_PROGRESS,
     priority: TaskPriority.MEDIUM,
     category: TaskCategory.BEHAVIORAL,
-    dueDate: new Date("2025-07-18T14:00:00.000Z"),
+    // 12 days from now
+    dueDate: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000),
   },
   {
     title: "Update adoption profile photos",
@@ -379,7 +401,17 @@ const taskSeedData = [
     status: TaskStatus.DONE,
     priority: TaskPriority.LOW,
     category: TaskCategory.ADMINISTRATIVE,
-    dueDate: new Date("2025-07-05T12:00:00.000Z"),
+    // 3 days from now
+    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+  },
+  {
+    title: "Submit monthly intake report to city council",
+    details: "Compile and send the monthly animal intake statistics report.",
+    status: TaskStatus.TODO,
+    priority: TaskPriority.HIGH,
+    category: TaskCategory.ADMINISTRATIVE,
+    // 7 days in the past — shows as overdue
+    dueDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
   },
 ];
 
@@ -697,7 +729,7 @@ async function seedAnimalsAndRelations() {
 
       const processingStaff = getRandomItem(staffMembers);
 
-      // --- Create Animal and Intake within a transaction ---
+      //  Create Animal and Intake within a transaction
       const animal = await prisma.animal.create({
         data: {
           name: animalData.name,
@@ -721,7 +753,7 @@ async function seedAnimalsAndRelations() {
         },
       });
 
-      // --- Always create an intake record for the new animal ---
+      // Always create an intake record for the new animal
       const intakeData: {
         animalId: string;
         type: IntakeType;
@@ -744,9 +776,28 @@ async function seedAnimalsAndRelations() {
         intakeData.sourcePartnerId = getRandomItem(allPartners)?.id;
       }
 
-      await prisma.intake.create({ data: intakeData });
+      await prisma.intake.create({
+        data: {
+          ...intakeData,
+          intakeDate: getRandomDateWithinLastDays(90, 1),
+        },
+      });
 
-      // --- Log activity and create initial note ---
+      // Seed a random adoption outcome for roughly half the animals
+      if (Math.random() > 0.5) {
+        const staffMember = getRandomItem(staffMembers);
+        await prisma.outcome.create({
+          data: {
+            animalId: animal.id,
+            type: OutcomeType.ADOPTION,
+            // Adoptions happen more recently than intakes (realistic lag)
+            outcomeDate: getRandomDateWithinLastDays(75, 1),
+            staffMemberId: staffMember.id,
+          },
+        });
+      }
+
+      // Log activity and create initial note
       await prisma.animalActivityLog.create({
         data: {
           animalId: animal.id,
@@ -776,6 +827,11 @@ async function seedAnimalsAndRelations() {
             category: TaskCategory.MEDICAL,
             priority: TaskPriority.HIGH,
             status: TaskStatus.TODO,
+            // Random due date between 3 and 7 days from now
+            dueDate: new Date(
+              Date.now() +
+                (Math.floor(Math.random() * 5) + 3) * 24 * 60 * 60 * 1000,
+            ),
           },
         });
       }
@@ -862,6 +918,48 @@ async function seedAssessments() {
   console.log("Seeded assessments.");
 }
 
+// seedChartData creates multiple intake/outcome records pointing
+// at the same animals — that's intentional, since in a real shelter one animal = one intake,
+// we just need the daily counts to make the chart look realistic.
+async function seedChartData() {
+  console.log("Seeding bulk intake/outcome data for chart demo...");
+  const animals = await prisma.animal.findMany();
+  const staffMembers = await prisma.person.findMany({
+    where: { user: { role: Role.STAFF } },
+  });
+
+  if (!animals.length || !staffMembers.length) {
+    console.log("No animals or staff found, skipping chart data seeding.");
+    return;
+  }
+
+  // Create ~80 intakes spread across the last 90 days
+  for (let i = 0; i < 80; i++) {
+    await prisma.intake.create({
+      data: {
+        animalId: getRandomItem(animals).id,
+        type: getRandomItem(Object.values(IntakeType)),
+        intakeDate: getRandomDateWithinLastDays(90, 1),
+        staffMemberId: getRandomItem(staffMembers).id,
+      },
+    });
+  }
+
+  // Create ~50 adoptions spread across the last 75 days (lag behind intakes)
+  for (let i = 0; i < 50; i++) {
+    await prisma.outcome.create({
+      data: {
+        animalId: getRandomItem(animals).id,
+        type: OutcomeType.RETURN_TO_OWNER,
+        outcomeDate: getRandomDateWithinLastDays(75, 1),
+        staffMemberId: getRandomItem(staffMembers).id,
+      },
+    });
+  }
+
+  console.log("Seeded bulk chart data.");
+}
+
 async function main() {
   console.log("Start seeding new data...");
   await seedPersonsAndUsers();
@@ -871,6 +969,7 @@ async function main() {
   await seedAnimalsAndRelations();
   await seedTasks();
   await seedAssessments();
+  await seedChartData();
   console.log("Seeding finished successfully.");
 }
 

@@ -960,7 +960,7 @@ async function seedChartData() {
   console.log("Seeded bulk chart data.");
 }
 
-async function main() {
+export async function main() {
   console.log("Start seeding new data...");
   await seedPersonsAndUsers();
   await seedLookupTables();

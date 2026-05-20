@@ -160,11 +160,11 @@ const _fetchAnimalCardData = async (): Promise<PetCardDataType> => {
         totalPetsChange: calculateChange(currentMonthAnimals, lastMonthAnimals),
         adoptedPetsChange: calculateChange(
           currentMonthAdoptions,
-          lastMonthAdoptions
+          lastMonthAdoptions,
         ),
         publishedPetsChange: calculateChange(
           currentMonthPublished,
-          lastMonthPublished
+          lastMonthPublished,
         ),
         todoTasksChange: calculateChange(currentMonthTasks, lastMonthTasks),
       },
@@ -178,7 +178,7 @@ const _fetchAnimalCardData = async (): Promise<PetCardDataType> => {
 export type ChartDataPoint = {
   date: string;
   intakes: number;
-  adoptions: number;
+  outcomes: number;
 };
 
 export type ChartData = ChartDataPoint[];
@@ -186,12 +186,17 @@ export type ChartData = ChartDataPoint[];
 const _fetchChartData = async (): Promise<ChartData> => {
   try {
     const days = 90;
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-    startDate.setHours(0, 0, 0, 0); // Start from the beginning of the day
 
-    // Fetch daily intake and adoption counts in parallel
-    const [intakeData, adoptionData] = await Promise.all([
+    const now = new Date();
+    const startDate = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate() - days,
+      ),
+    );
+
+    const [intakeData, outcomeData] = await Promise.all([
       prisma.intake.groupBy({
         by: ["intakeDate"],
         where: { intakeDate: { gte: startDate } },
@@ -201,7 +206,6 @@ const _fetchChartData = async (): Promise<ChartData> => {
       prisma.outcome.groupBy({
         by: ["outcomeDate"],
         where: {
-          type: OutcomeType.ADOPTION,
           outcomeDate: { gte: startDate },
         },
         _count: { id: true },
@@ -209,30 +213,28 @@ const _fetchChartData = async (): Promise<ChartData> => {
       }),
     ]);
 
-    // Create maps for quick lookups
     const intakeMap = new Map(
       intakeData.map((item) => [
         item.intakeDate.toISOString().split("T")[0],
         item._count.id,
-      ])
+      ]),
     );
-    const adoptionMap = new Map(
-      adoptionData.map((item) => [
+    const outcomeMap = new Map(
+      outcomeData.map((item) => [
         item.outcomeDate.toISOString().split("T")[0],
         item._count.id,
-      ])
+      ]),
     );
 
-    // Generate a complete list of dates for the last 90 days
     const chartData = Array.from({ length: days }, (_, i) => {
       const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i);
+      date.setUTCDate(startDate.getUTCDate() + i);
       const dateString = date.toISOString().split("T")[0];
 
       return {
         date: dateString,
         intakes: intakeMap.get(dateString) || 0,
-        adoptions: adoptionMap.get(dateString) || 0,
+        outcomes: outcomeMap.get(dateString) || 0,
       };
     });
 
@@ -242,8 +244,6 @@ const _fetchChartData = async (): Promise<ChartData> => {
     throw new Error("Error fetching chart data.");
   }
 };
-
-
 
 export type TaskAnalyticsPayload = Prisma.TaskGetPayload<{
   select: {
@@ -268,7 +268,9 @@ export type TaskAnalyticsPayload = Prisma.TaskGetPayload<{
   };
 }>;
 
-const _fetchAnalyticsTaskTableData = async (): Promise<TaskAnalyticsPayload[]> => {
+const _fetchAnalyticsTaskTableData = async (): Promise<
+  TaskAnalyticsPayload[]
+> => {
   try {
     const tasks = await prisma.task.findMany({
       // Filter for tasks that are not yet completed
@@ -392,17 +394,17 @@ const _fetchAnimalsRequiringAttention = async (): Promise<
 };
 
 export const fetchAnalyticsTaskTableData = RequirePermission(
-  Permissions.ANIMAL_READ_ANALYTICS
+  Permissions.ANIMAL_READ_ANALYTICS,
 )(_fetchAnalyticsTaskTableData);
 
 export const fetchPetCardData = RequirePermission(
-  Permissions.ANIMAL_READ_ANALYTICS
+  Permissions.ANIMAL_READ_ANALYTICS,
 )(_fetchAnimalCardData);
 
 export const fetchChartData = RequirePermission(
-  Permissions.ANIMAL_READ_ANALYTICS
+  Permissions.ANIMAL_READ_ANALYTICS,
 )(_fetchChartData);
 
 export const fetchAnimalsRequiringAttention = RequirePermission(
-  Permissions.ANIMAL_READ_ANALYTICS
+  Permissions.ANIMAL_READ_ANALYTICS,
 )(_fetchAnimalsRequiringAttention);

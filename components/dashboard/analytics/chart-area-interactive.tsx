@@ -36,8 +36,8 @@ const chartConfig = {
     label: "Intakes",
     color: "hsl(var(--chart-1))",
   },
-  adoptions: {
-    label: "Adoptions",
+  outcomes: {
+    label: "Outcomes",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
@@ -63,9 +63,9 @@ export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
         <CardTitle>Intakes vs. Outcomes</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Daily animal intakes compared to adoptions.
+            Daily animal intakes compared to outcomes.
           </span>
-          <span className="@[540px]/card:hidden">Intakes vs. Adoptions</span>
+          <span className="@[540px]/card:hidden">Intakes vs. Outcomes</span>
         </CardDescription>
         <CardAction>
           <ToggleGroup
@@ -120,15 +120,15 @@ export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
                   stopOpacity={0.1}
                 />
               </linearGradient>
-              <linearGradient id="fillAdoptions" x1="0" y1="0" x2="0" y2="1">
+              <linearGradient id="fillOutcomes" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-adoptions)"
+                  stopColor="var(--color-outcomes)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-adoptions)"
+                  stopColor="var(--color-outcomes)"
                   stopOpacity={0.1}
                 />
               </linearGradient>
@@ -163,10 +163,10 @@ export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
               }
             />
             <Area
-              dataKey="adoptions"
+              dataKey="outcomes"
               type="natural"
-              fill="url(#fillAdoptions)"
-              stroke="var(--color-adoptions)"
+              fill="url(#fillOutcomes)"
+              stroke="var(--color-outcomes)"
               stackId="a"
             />
             <Area

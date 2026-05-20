@@ -91,7 +91,7 @@ export function OutcomeForm({
 
   const [state, formAction, isPending] = useActionState(
     action,
-    INITIAL_FORM_STATE
+    INITIAL_FORM_STATE,
   );
 
   const form = useForm<OutcomeFormData>({
@@ -141,7 +141,10 @@ export function OutcomeForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-8"
+      >
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle>
@@ -165,6 +168,7 @@ export function OutcomeForm({
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      value={field.value}
                       disabled={isAdoptionOutcome || isEditMode}
                     >
                       <FormControl>
@@ -197,7 +201,7 @@ export function OutcomeForm({
                             variant={"outline"}
                             className={cn(
                               "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value ? (
@@ -298,8 +302,8 @@ export function OutcomeForm({
                   ? "Updating..."
                   : "Processing..."
                 : isEditMode
-                ? "Update Outcome"
-                : "Process Outcome"}
+                  ? "Update Outcome"
+                  : "Process Outcome"}
             </Button>
           </CardFooter>
         </Card>

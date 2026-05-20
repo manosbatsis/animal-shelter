@@ -4,7 +4,7 @@ import * as z from "zod";
 
 export const ReIntakeFormSchema = z
   .object({
-    intakeDate: z.coerce.date(),
+    intakeDate: z.date(),
     intakeType: z.enum(IntakeType),
     healthStatus: z.enum(AnimalHealthStatus),
     notes: z.string().optional(),
@@ -70,7 +70,7 @@ export const ReIntakeFormSchema = z
 
 export const IntakeFieldsSchema = z.object({
   intakeType: z.enum(IntakeType).optional(),
-  intakeDate: z.coerce.date().optional(),
+  intakeDate: z.date().optional(),
   notes: z.string().optional(),
   sourcePartnerId: z.string().optional(),
   foundAddress: z.string().optional(),

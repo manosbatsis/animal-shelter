@@ -37,8 +37,6 @@ import { AnimalReIntakeFormPayload, PartnerPayload } from "@/app/lib/types";
 import Link from "next/link";
 import { IntakeFormFields } from "./intake-form-fields";
 import { ReIntakeFormSchema } from "@/app/lib/zod-schemas/intake.schema";
-import { IntakeFieldsValues } from "@/app/lib/zod-schemas/intake.schema";
-import { Control, UseFormWatch } from "react-hook-form";
 
 type ReIntakeFormValues = z.infer<typeof ReIntakeFormSchema>;
 
@@ -150,15 +148,9 @@ const ReIntakeForm = ({ animal, partners }: ReIntakeFormProps) => {
             </div>
 
             {/* Intake Fields Component */}
-            {/* <IntakeFormFields
+            <IntakeFormFields
               control={form.control}
               watch={form.watch}
-              partners={partners}
-              isEditMode={false}
-            /> */}
-            <IntakeFormFields
-              control={form.control as unknown as Control<IntakeFieldsValues>}
-              watch={form.watch as unknown as UseFormWatch<IntakeFieldsValues>}
               partners={partners}
               isEditMode={false}
             />

@@ -28,7 +28,7 @@ const EditOutcomePage = async ({ params }: Props) => {
 
   const animal = outcome.animal;
   const application = outcome.adoptionApplication;
-
+  
   return (
     <main className="container mx-auto">
       <Button asChild variant="ghost" className="mb-4">

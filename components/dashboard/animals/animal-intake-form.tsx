@@ -13,7 +13,7 @@ import {
   AnimalFormState,
 } from "@/app/lib/form-state-types";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { useForm } from "react-hook-form";
+import { Control, FieldValues, useForm, UseFormWatch } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
@@ -70,7 +70,6 @@ import {
 import Link from "next/link";
 import { IntakeFormFields } from "./intake-form-fields";
 import { IntakeFieldsValues } from "@/app/lib/zod-schemas/intake.schema";
-import { Control, UseFormWatch } from "react-hook-form";
 
 type AnimalFormValues = z.infer<typeof AnimalFormSchema>;
 
@@ -593,20 +592,26 @@ const AnimalForm = ({
 
             {/* Intake Section - Only show on CREATE mode */}
             {!isEditMode && (
-              <IntakeFormFields
-                control={form.control as unknown as Control<IntakeFieldsValues>}
-                watch={
-                  form.watch as unknown as UseFormWatch<IntakeFieldsValues>
-                }
-                partners={partners}
-                isEditMode={false}
-              />
               // <IntakeFormFields
               //   control={form.control}
               //   watch={form.watch}
               //   partners={partners}
               //   isEditMode={false}
               // />
+              <IntakeFormFields
+                control={
+                  form.control as unknown as Control<
+                    FieldValues & IntakeFieldsValues
+                  >
+                }
+                watch={
+                  form.watch as unknown as UseFormWatch<
+                    FieldValues & IntakeFieldsValues
+                  >
+                }
+                partners={partners}
+                isEditMode={false}
+              />
             )}
           </CardContent>
 

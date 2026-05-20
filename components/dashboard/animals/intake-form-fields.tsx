@@ -28,23 +28,23 @@ import { IntakeType } from "@prisma/client";
 import { intakeTypeOptions } from "@/app/lib/utils/enum-formatter";
 import { US_STATES } from "@/app/lib/constants/us-states";
 import { PartnerPayload } from "@/app/lib/types";
-import { Control, UseFormWatch } from "react-hook-form";
+import { FieldValues, Control, UseFormWatch, Path } from "react-hook-form";
 import { IntakeFieldsValues } from "@/app/lib/zod-schemas/intake.schema";
 
-interface IntakeFormFieldsProps {
-  control: Control<IntakeFieldsValues>;
-  watch: UseFormWatch<IntakeFieldsValues>;
+interface IntakeFormFieldsProps<T extends FieldValues & IntakeFieldsValues> {
+  control: Control<T>;
+  watch: UseFormWatch<T>;
   partners: PartnerPayload[];
   isEditMode?: boolean;
 }
 
-export const IntakeFormFields = ({
+export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
   control,
   watch,
   partners,
   isEditMode = false,
-}: IntakeFormFieldsProps) => {
-  const intakeType = watch("intakeType");
+}: IntakeFormFieldsProps<T>) => {
+  const intakeType = watch("intakeType" as Path<T>);
 
   return (
     <div className="space-y-6">
@@ -53,7 +53,7 @@ export const IntakeFormFields = ({
       <div className="grid grid-cols-1 md:grid-cols-6 gap-x-4 gap-y-8">
         <FormField
           control={control}
-          name="intakeType"
+          name={"intakeType" as Path<T>}
           render={({ field }) => (
             <FormItem className="col-span-3">
               <FormLabel>Intake Type</FormLabel>
@@ -82,7 +82,7 @@ export const IntakeFormFields = ({
 
         <FormField
           control={control}
-          name="intakeDate"
+          name={"intakeDate" as Path<T>}
           render={({ field }) => (
             <FormItem className="col-span-3">
               <FormLabel>Intake Date</FormLabel>
@@ -93,7 +93,7 @@ export const IntakeFormFields = ({
                       variant={"outline"}
                       className={cn(
                         "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                       disabled={isEditMode}
                     >
@@ -125,7 +125,7 @@ export const IntakeFormFields = ({
 
         <FormField
           control={control}
-          name="notes"
+          name={"notes" as Path<T>}
           render={({ field }) => (
             <FormItem className="col-span-full">
               <FormLabel>Internal Notes</FormLabel>
@@ -155,7 +155,7 @@ export const IntakeFormFields = ({
             <h4 className="font-semibold col-span-full">Transfer Details</h4>
             <FormField
               control={control}
-              name="sourcePartnerId"
+              name={"sourcePartnerId" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-full">
                   <FormLabel>Source Partner</FormLabel>
@@ -189,7 +189,7 @@ export const IntakeFormFields = ({
             <h4 className="font-semibold col-span-full">Location Found</h4>
             <FormField
               control={control}
-              name="foundCity"
+              name={"foundCity" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-3">
                   <FormLabel>City</FormLabel>
@@ -206,7 +206,7 @@ export const IntakeFormFields = ({
             />
             <FormField
               control={control}
-              name="foundState"
+              name={"foundState" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-3">
                   <FormLabel>State</FormLabel>
@@ -234,7 +234,7 @@ export const IntakeFormFields = ({
             />
             <FormField
               control={control}
-              name="foundAddress"
+              name={"foundAddress" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-full">
                   <FormLabel>Address / Cross Streets</FormLabel>
@@ -259,7 +259,7 @@ export const IntakeFormFields = ({
             </h4>
             <FormField
               control={control}
-              name="surrenderingPersonName"
+              name={"surrenderingPersonName" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-3">
                   <FormLabel>Full Name</FormLabel>
@@ -276,7 +276,7 @@ export const IntakeFormFields = ({
             />
             <FormField
               control={control}
-              name="surrenderingPersonPhone"
+              name={"surrenderingPersonPhone" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-3">
                   <FormLabel>Phone Number</FormLabel>

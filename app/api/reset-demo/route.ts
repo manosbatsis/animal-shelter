@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { main } from "@/prisma/seed";
+import { isDemo } from "@/app/lib/flags";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
+  // Hard exit if not a demo environment
+  if (!isDemo) {
+    return NextResponse.json({ error: "Not Found" }, { status: 404 });
+  }
+  
   // Protect the endpoint with a secret key
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get("secret");

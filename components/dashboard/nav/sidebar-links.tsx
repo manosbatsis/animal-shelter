@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react";
 import type { Session } from "next-auth";
 import { IconPaw } from "@tabler/icons-react";

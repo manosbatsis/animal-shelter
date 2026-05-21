@@ -33,7 +33,7 @@ const getRandomItem = <T>(arr: T[]): T => {
 };
 
 const baseUrl = isDemo
-  ? "https://bpkxtpt6ukyq9hzk.public.blob.vercel-storage.com"
+  ? "https://bpkxtpt6ukyq9hzk.public.blob.vercel-storage.com/seed"
   : "/uploads";
 
 // Helper function to generate random dates between 2023 and now

@@ -1,52 +1,80 @@
-import { put } from '@vercel/blob';
-import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
-import { Permissions } from '@/app/lib/auth/permissions';
-import { hasPermission } from '@/app/lib/auth/hasPermission';
+import { put, del } from "@vercel/blob";
+import { prisma } from "@/app/lib/prisma";
+import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { Permissions } from "@/app/lib/auth/permissions";
+import { hasPermission } from "@/app/lib/auth/hasPermission";
+import { AnimalActivityType } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   const session = await auth();
-
   if (!session?.user) {
-    return NextResponse.json({ error: 'Unauthorized: You must be logged in.' }, { status: 401 });
+    return NextResponse.json(
+      { error: "Unauthorized: You must be logged in." },
+      { status: 401 },
+    );
   }
-  
-  const isAuthorized = await hasPermission(Permissions.ANIMAL_UPDATE);
 
+  const isAuthorized = await hasPermission(Permissions.ANIMAL_UPDATE);
   if (!isAuthorized) {
-    return NextResponse.json({ error: 'Forbidden: You do not have permission to upload files.' }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden: You do not have permission to upload files." },
+      { status: 403 },
+    );
   }
-  
+
+  const staffMemberId = session.user.personId;
+  if (!staffMemberId) {
+    return NextResponse.json(
+      { error: "Your account is not associated with a person record." },
+      { status: 403 },
+    );
+  }
+
+  let blobUrl: string | null = null;
+
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File; 
+    const file = formData.get("file") as File;
+    const animalId = formData.get("animalId") as string;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file data found in request.' }, { status: 400 });
+      return NextResponse.json({ error: "No file found." }, { status: 400 });
     }
-    
-    // UPLOAD TO VERCEL BLOB
-    const blob = await put(file.name, file, {
-      access: 'public',
+
+    // upload to blob
+    const blob = await put(`animalShelterUserUploads/${file.name}`, file, {
+      access: "public",
       addRandomSuffix: true,
     });
+    blobUrl = blob.url; // only used for cleanup on failure
 
-    // SUCCESS RESPONSE
-    return NextResponse.json({ 
-      url: blob.url,
-      message: 'File successfully uploaded to Vercel Blob.',
-    }, { status: 201 });
+    // save to DB
+    await prisma.$transaction(async (tx) => {
+      await tx.animalImage.create({
+        data: { url: blob.url, animalId },
+      });
 
+      await tx.animalActivityLog.create({
+        data: {
+          animalId,
+          activityType: AnimalActivityType.PHOTO_UPLOADED,
+          changedById: staffMemberId,
+          changeSummary: `A new photo was uploaded. URL: ${blob.url}`,
+        },
+      });
+    });
+
+    revalidatePath(`/dashboard/animals/${animalId}`);
+    revalidatePath(`/dashboard/animals/${animalId}/documents`);
+
+    return NextResponse.json({ url: blob.url }, { status: 201 });
   } catch (error) {
-    let errorMessage = 'An unknown error occurred during the Vercel Blob upload.';
-    if (error instanceof Error) {
-      errorMessage = error.message; 
-    } 
-    console.error('Blob upload failed:', error);
-    
-    return NextResponse.json({ 
-      error: 'Upload failed on the server', 
-      details: errorMessage
-    }, { status: 500 });
+    if (blobUrl) {
+      await del(blobUrl).catch(() => {});
+    }
+    console.error("Upload failed:", error);
+    return NextResponse.json({ error: "Upload failed." }, { status: 500 });
   }
 }

@@ -524,10 +524,6 @@ export const deleteAnimalImage = withAuthenticatedUser(
   RequirePermission(Permissions.ANIMAL_DELETE_IMAGE)(_deleteAnimalImage)
 );
 
-export const addAnimalImage = withAuthenticatedUser(
-  RequirePermission(Permissions.ANIMAL_UPDATE)(_addAnimalImage)
-);
-
 export const createAnimal = withAuthenticatedUser(
   RequirePermission(Permissions.ANIMAL_CREATE)(_createAnimal)
 );

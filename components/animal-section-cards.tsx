@@ -79,7 +79,7 @@ const AnimalSectionCards = async ({ params }: Props) => {
       <Alert className="mb-4">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          <span className="font-medium">{config.label}</span>
+          <span className="font-medium text-foreground">{config.label}</span>
         </AlertDescription>
       </Alert>
     ) : null;
@@ -287,7 +287,7 @@ const AnimalSectionCards = async ({ params }: Props) => {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <span className="font-medium">
+                <span className="font-medium text-foreground">
                   {pendingTasksCount} pending task
                   {pendingTasksCount > 1 ? "s" : ""}
                 </span>

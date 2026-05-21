@@ -24,6 +24,7 @@ import { getAnimalSize } from "../utils/animal-size";
 
 import { ConflictError, NotFoundError } from "../utils/errors";
 import { del } from "@vercel/blob";
+import { isDemo } from "@/lib/flags";
 const _createAnimal = async (
   user: SessionUser,
   prevState: AnimalFormState,
@@ -450,7 +451,7 @@ const _addAnimalImage = async (
 
   try {
     await prisma.$transaction(async (tx) => {
-      // 1. Create the AnimalImage record
+      // Create the AnimalImage record
       await tx.animalImage.create({
         data: {
           url: imageUrl,
@@ -458,7 +459,7 @@ const _addAnimalImage = async (
         },
       });
 
-      // 2. Log the activity
+      // Log the activity
       if (staffMemberId) {
         await tx.animalActivityLog.create({
           data: {
@@ -471,7 +472,7 @@ const _addAnimalImage = async (
       }
     });
 
-    // 3. Revalidate paths to show the new image immediately
+    // Revalidate paths to show the new image immediately
     revalidatePath(`/dashboard/animals/${validatedAnimalId}`);
     revalidatePath(`/dashboard/animals/${validatedAnimalId}/documents`);
 
@@ -499,7 +500,10 @@ const _deleteAnimalImage = async (
 
   try {
     // Delete the image file from Vercel Blob storage
-    await del(imageUrl);
+    // In demo mode, skip blob deletion to preserve seed images
+    if (!isDemo) {
+      await del(imageUrl);
+    }
 
     // Delete the image record from the database
     await prisma.animalImage.delete({

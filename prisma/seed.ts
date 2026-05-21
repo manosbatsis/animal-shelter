@@ -21,6 +21,7 @@ import {
   OutcomeType,
 } from "@prisma/client";
 const prisma = new PrismaClient();
+import { isDemo } from "@/lib/flags";
 
 // =================================================================//
 //                             MOCK DATA                            //
@@ -30,6 +31,10 @@ const prisma = new PrismaClient();
 const getRandomItem = <T>(arr: T[]): T => {
   return arr[Math.floor(Math.random() * arr.length)];
 };
+
+const baseUrl = isDemo
+  ? "https://bpkxtpt6ukyq9hzk.public.blob.vercel-storage.com"
+  : "/uploads";
 
 // Helper function to generate random dates between 2023 and now
 function getRandomDate(yearsBack = 3): Date {
@@ -245,7 +250,7 @@ const animalSeedData = [
     intakeType: IntakeType.OWNER_SURRENDER,
     healthStatus: AnimalHealthStatus.HEALTHY,
     legalStatus: AnimalLegalStatus.NONE,
-    images: ["/uploads/dog1.jpg", "/uploads/dog1-1.webp"],
+    images: [`${baseUrl}/dog1.jpg`, `${baseUrl}/dog1-1.webp`],
   },
   {
     name: "Flash",
@@ -261,7 +266,7 @@ const animalSeedData = [
     intakeType: IntakeType.STRAY,
     healthStatus: AnimalHealthStatus.AWAITING_VET_EXAM,
     legalStatus: AnimalLegalStatus.STRAY_HOLD,
-    images: ["/uploads/dog2.jpg", "/uploads/dog2-1.webp"],
+    images: [`${baseUrl}/dog2.jpg`, `${baseUrl}/dog2-1.webp`],
   },
   {
     name: "Fido",
@@ -274,7 +279,7 @@ const animalSeedData = [
     intakeType: IntakeType.TRANSFER_IN,
     healthStatus: AnimalHealthStatus.UNDER_VET_CARE,
     legalStatus: AnimalLegalStatus.NONE,
-    images: ["/uploads/dog3.jpg", "/uploads/dog3-1.jpg"],
+    images: [`${baseUrl}/dog3.jpg`, `${baseUrl}/dog3-1.jpg`],
   },
   {
     name: "Whiskers",
@@ -288,9 +293,9 @@ const animalSeedData = [
     healthStatus: AnimalHealthStatus.HEALTHY,
     legalStatus: AnimalLegalStatus.NONE,
     images: [
-      "/uploads/cat1.webp",
-      "/uploads/cat1-1.jpg",
-      "/uploads/cat1-2.jpg",
+      `${baseUrl}/cat1.webp`,
+      `${baseUrl}/cat1-1.jpg`,
+      `${baseUrl}/cat1-2.jpg`,
     ],
   },
   {
@@ -305,9 +310,9 @@ const animalSeedData = [
     healthStatus: AnimalHealthStatus.AWAITING_SPAY_NEUTER,
     legalStatus: AnimalLegalStatus.NONE,
     images: [
-      "/uploads/cat2.webp",
-      "/uploads/cat2-1.jpg",
-      "/uploads/cat2-2.jpg",
+      `${baseUrl}/cat2.webp`,
+      `${baseUrl}/cat2-1.jpg`,
+      `${baseUrl}/cat2-2.jpg`,
     ],
   },
   {
@@ -322,9 +327,9 @@ const animalSeedData = [
     healthStatus: AnimalHealthStatus.AWAITING_TRIAGE,
     legalStatus: AnimalLegalStatus.POLICE_HOLD,
     images: [
-      "/uploads/reptile2.webp",
-      "/uploads/reptile2-1.jpg",
-      "/uploads/reptile2-2.jpg",
+      `${baseUrl}/reptile2.webp`,
+      `${baseUrl}/reptile2-1.jpg`,
+      `${baseUrl}/reptile2-2.jpg`,
     ],
   },
   {
@@ -341,7 +346,7 @@ const animalSeedData = [
     intakeType: IntakeType.STRAY,
     healthStatus: AnimalHealthStatus.HEALTHY,
     legalStatus: AnimalLegalStatus.STRAY_HOLD,
-    images: ["/uploads/dog3-2.webp"],
+    images: [`${baseUrl}/dog3-2.webp`],
   },
   {
     name: "Leo",
@@ -357,7 +362,7 @@ const animalSeedData = [
     intakeType: IntakeType.BORN_IN_CARE,
     healthStatus: AnimalHealthStatus.HEALTHY,
     legalStatus: AnimalLegalStatus.NONE,
-    images: ["/uploads/dog1-3.webp"],
+    images: [`${baseUrl}/dog1-3.webp`],
   },
   {
     name: "Daisy",
@@ -370,7 +375,7 @@ const animalSeedData = [
     intakeType: IntakeType.TRANSFER_IN,
     healthStatus: AnimalHealthStatus.UNDER_VET_CARE,
     legalStatus: AnimalLegalStatus.NONE,
-    images: ["/uploads/dog1-2.jpg"],
+    images: [`${baseUrl}/dog1-2.jpg`],
   },
 ];
 

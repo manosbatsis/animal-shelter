@@ -1,7 +1,7 @@
 import DemoBanner from "@/components/demo-banner";
 import Footer from "../../components/public-pages/footer";
 import TopNavWrapper from "../../components/public-pages/nav/top-nav-wrapper";
-import { isDemo } from "../lib/flags";
+import { isDemo } from "../../lib/flags";
 
 export default async function PagesLayout({
   children,

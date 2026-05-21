@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { main } from "@/prisma/seed";
-import { isDemo } from "@/app/lib/flags";
+import { isDemo } from "@/lib/flags";
 
 const prisma = new PrismaClient();
 

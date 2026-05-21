@@ -90,7 +90,7 @@ const _createOutcome = async (
         },
       });
 
-      // VERIFY: Check if the update succeeded.
+      // Check if the update succeeded.
       if (updateResult.count === 0) {
         // If count is 0, another process archived the animal first. Abort.
         throw new ConflictError(

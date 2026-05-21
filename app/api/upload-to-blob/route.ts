@@ -5,7 +5,6 @@ import { auth } from "@/auth";
 import { Permissions } from "@/app/lib/auth/permissions";
 import { hasPermission } from "@/app/lib/auth/hasPermission";
 import { AnimalActivityType } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -65,9 +64,6 @@ export async function POST(request: Request) {
         },
       });
     });
-
-    revalidatePath(`/dashboard/animals/${animalId}`);
-    revalidatePath(`/dashboard/animals/${animalId}/documents`);
 
     return NextResponse.json({ url: blob.url }, { status: 201 });
   } catch (error) {

@@ -1,23 +1,30 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { AnimalImage } from '@prisma/client';
-import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
-import { useTransition } from 'react';
-import { deleteAnimalImage } from '@/app/lib/actions/animal.actions';
-import { toast } from 'sonner';
+import Image from "next/image";
+import { AnimalImage } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { useTransition } from "react";
+import { deleteAnimalImage } from "@/app/lib/actions/animal.actions";
+import { toast } from "sonner";
 
 interface AnimalImageGalleryProps {
   images: AnimalImage[];
   animalId: string;
 }
 
-export default function AnimalImageGallery({ images, animalId }: AnimalImageGalleryProps) {
+export default function AnimalImageGallery({
+  images,
+  animalId,
+}: AnimalImageGalleryProps) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = (imageId: string, imageUrl: string) => {
-    if (confirm('Are you sure you want to delete this image? This cannot be undone.')) {
+    if (
+      confirm(
+        "Are you sure you want to delete this image? This cannot be undone.",
+      )
+    ) {
       startTransition(async () => {
         const result = await deleteAnimalImage(imageId, imageUrl, animalId);
         if (result.success) {
@@ -39,14 +46,19 @@ export default function AnimalImageGallery({ images, animalId }: AnimalImageGall
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {images.map((image) => (
-        <div key={image.id} className="relative group border rounded-lg overflow-hidden">
+      {images.map((image, index) => (
+        <div
+          key={image.id}
+          className="relative group border rounded-lg overflow-hidden"
+        >
           <Image
             src={image.url}
             alt="Animal image"
             width={300}
             height={300}
             className="object-cover w-full h-full aspect-square"
+            loading={index === 0 ? "eager" : "lazy"}
+            priority={index === 0}
           />
           <div className="absolute top-2 right-2">
             <Button

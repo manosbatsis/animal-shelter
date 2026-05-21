@@ -228,17 +228,17 @@ const AnimalSectionCards = async ({ params }: Props) => {
             <div className="space-y-2">
               <div className="flex items-center justify-between border-b pb-2 text-sm">
                 <span className="text-muted-foreground">Spayed/Neutered</span>
-                <span className="font-medium">
+                <span className="font-medium text-foreground">
                   {animal.sex !== Sex.UNKNOWN ? (
                     animal.isSpayedNeutered ? (
                       <span className="flex items-center gap-1 text-green-600">
                         <CheckCircle2 className="h-4 w-4" /> Yes
                       </span>
                     ) : (
-                      <span className="text-muted-foreground">No</span>
+                      <span>No</span>
                     )
                   ) : (
-                    <span className="text-muted-foreground">N/A</span>
+                    <span>N/A</span>
                   )}
                 </span>
               </div>

@@ -1,6 +1,6 @@
 "use client";
-
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Uppy from "@uppy/core";
 import Dashboard from "@uppy/react/dashboard";
 import XHRUpload from "@uppy/xhr-upload";
@@ -11,7 +11,6 @@ import { toast } from "sonner";
 interface UppyUploaderProps {
   animalId: string;
 }
-
 interface UploadResponse {
   body?: {
     url?: string;
@@ -19,6 +18,8 @@ interface UploadResponse {
 }
 
 const UppyUploader = ({ animalId }: UppyUploaderProps) => {
+  const router = useRouter();
+
   const [uppy] = useState(() =>
     new Uppy({
       debug: true,
@@ -27,17 +28,18 @@ const UppyUploader = ({ animalId }: UppyUploaderProps) => {
       endpoint: "/api/upload-to-blob",
       formData: true,
       fieldName: "file",
+      allowedMetaFields: ["animalId"],
     }),
   );
 
   useEffect(() => {
-    // Set metadata once the component has the animalId
     uppy.setMeta({ animalId });
 
     const handleUploadSuccess = (file: unknown, response: unknown) => {
       const res = response as UploadResponse;
       if (res?.body?.url) {
         toast.success("Image uploaded successfully!");
+        router.refresh();
       } else {
         toast.error("Upload succeeded but no URL was returned.");
       }
@@ -47,16 +49,15 @@ const UppyUploader = ({ animalId }: UppyUploaderProps) => {
       const err = error as Error;
       toast.error(err?.message || "Failed to upload image. Please try again.");
     };
-    
-    uppy.on('upload-success', handleUploadSuccess);
-    uppy.on('upload-error', handleUploadError);
 
-    // Cleanup listeners when the component unmounts
+    uppy.on("upload-success", handleUploadSuccess);
+    uppy.on("upload-error", handleUploadError);
+
     return () => {
-      uppy.off('upload-success', handleUploadSuccess);
-      uppy.off('upload-error', handleUploadError);
+      uppy.off("upload-success", handleUploadSuccess);
+      uppy.off("upload-error", handleUploadError);
     };
-  }, [uppy, animalId]);
+  }, [uppy, animalId, router]);
 
   return (
     <div>

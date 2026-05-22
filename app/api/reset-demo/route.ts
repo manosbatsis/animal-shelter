@@ -22,24 +22,32 @@ export async function GET(request: Request) {
   try {
     console.log("Starting demo database reset...");
 
-    // Wipe the database in the correct order to respect relations
-    // Delete models that have foreign keys first
-    console.log("Wiping existing data...");
-    await prisma.assessment.deleteMany({});
-    await prisma.assessmentTemplate.deleteMany({});
-    await prisma.task.deleteMany({});
+    // Delete deep relation/junction records & logs first
+    await prisma.animalActivityLog.deleteMany({});
+    await prisma.templateField.deleteMany({});
+    await prisma.medicalRecord.deleteMany({});
     await prisma.note.deleteMany({});
+    await prisma.task.deleteMany({});
+    await prisma.assessment.deleteMany({});
+    
+    // Delete operational records that link animals, people, and templates
+    await prisma.outcome.deleteMany({});
     await prisma.intake.deleteMany({});
     await prisma.animalImage.deleteMany({});
-    // Now delete models that are depended upon
+    await prisma.assessmentTemplate.deleteMany({});
+
+    // Delete core entities that were referenced by the operational records above
     await prisma.user.deleteMany({});
-    await prisma.animal.deleteMany({});
     await prisma.person.deleteMany({});
+    await prisma.animal.deleteMany({});
     await prisma.partner.deleteMany({});
+
+    // Delete master configuration/lookup tables last
+    await prisma.characteristic.deleteMany({});
+    await prisma.color.deleteMany({});
     await prisma.breed.deleteMany({});
     await prisma.species.deleteMany({});
-    await prisma.color.deleteMany({});
-    await prisma.characteristic.deleteMany({});
+
     console.log("Database wiped.");
 
     // Run full seeding logic

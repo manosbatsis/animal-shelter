@@ -164,6 +164,7 @@ To test the admin dashboard, use the following credentials:
 
 - **Username:** admin@example.com
 - **Password:** The password you set for `ADMIN_PASSWORD` in your `.env` file.
+- **Password (for demo page):** `7dJbys5@?tMA`
 
 ## Getting Started
 

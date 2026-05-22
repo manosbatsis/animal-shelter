@@ -22,47 +22,19 @@ import {
 } from "@prisma/client";
 const prisma = new PrismaClient();
 import { isDemo } from "@/lib/flags";
+import {
+  getRandomDate,
+  getRandomDateWithinLastDays,
+  getRandomItem,
+} from "@/app/lib/utils/seeding-utils";
 
 // =================================================================//
 //                             MOCK DATA                            //
 // =================================================================//
 
-// Helper function to get a random item from an array
-const getRandomItem = <T>(arr: T[]): T => {
-  return arr[Math.floor(Math.random() * arr.length)];
-};
-
 const baseUrl = isDemo
   ? "https://bpkxtpt6ukyq9hzk.public.blob.vercel-storage.com/seed"
   : "/uploads";
-
-// Helper function to generate random dates between 2023 and now
-function getRandomDate(yearsBack = 3): Date {
-  const end = new Date();
-  const start = new Date(
-    end.getFullYear() - yearsBack,
-    end.getMonth(),
-    end.getDate(),
-  );
-  return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
-  );
-}
-
-// Generates a random date within the last N days from today (UTC)
-function getRandomDateWithinLastDays(maxDaysAgo: number, minDaysAgo = 1): Date {
-  const now = new Date();
-  const daysAgo =
-    Math.floor(Math.random() * (maxDaysAgo - minDaysAgo + 1)) + minDaysAgo;
-  const date = new Date(
-    Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate() - daysAgo,
-    ),
-  );
-  return date;
-}
 
 const personData = [
   { name: "SYSTEM", type: PersonType.AGENCY, email: "system@internal.local" },
@@ -593,7 +565,7 @@ async function seedPersonsAndUsers() {
     });
 
     if (pData.role) {
-      let passwordToHash = "password123"; // Default password for non-admin users
+      let passwordToHash = "7dJbys5@?tMA"; // Default password for non-admin users
 
       if (pData.role === Role.ADMIN) {
         passwordToHash = process.env.ADMIN_PASSWORD;
@@ -978,13 +950,24 @@ export async function main() {
   console.log("Seeding finished successfully.");
 }
 
-main()
-  .then(async () => {
-    console.log("Disconnecting Prisma Client...");
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
-    console.error("An error occurred during the seeding process:", e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+const isExplicitSeedRun =
+  process.argv.includes("seed") ||
+  process.env.PRISMA_SEEDING === "true" ||
+  (typeof require !== "undefined" && require.main === module);
+
+if (isExplicitSeedRun) {
+  main()
+    .then(async () => {
+      console.log("Disconnecting Prisma Client...");
+      await prisma.$disconnect();
+    })
+    .catch(async (e) => {
+      console.error("An error occurred during the seeding process:", e);
+      await prisma.$disconnect();
+      process.exit(1);
+    });
+} else {
+  console.log(
+    "ℹ️ Seed script evaluated during build phase. Database seeding skipped.",
+  );
+}

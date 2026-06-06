@@ -1,19 +1,23 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy prisma directory and generate prisma client
-COPY prisma ./prisma/
-RUN npx prisma generate
+# Used while building the docker image for Prisma generation.
+ARG DATABASE_URL=postgresql://postgres:mysecretpassword@postgres:5432/postgres
+ENV DATABASE_URL=$DATABASE_URL
 
 # Copy package.json and package-lock.json
 COPY package.json package-lock.json* ./
 
 # Install dependencies
 RUN npm ci
+# Copy prisma directory and generate prisma client
+COPY prisma ./prisma/
+COPY prisma.config.ts ./prisma.config.ts
+RUN npx prisma generate
 
 # Development image, copy all the files
 FROM base AS runner

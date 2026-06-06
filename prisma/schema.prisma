@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_URL") // uses connection pooling
 }
 
 enum Role {
@@ -137,9 +136,9 @@ enum AnimalHealthStatus {
 enum AnimalListingStatus {
   DRAFT // Profile is being prepared, not yet ready for public view.
   PUBLISHED // Profile is live, publicly accessible, and available for applications.
-  
+
   PENDING_ADOPTION // An application has been approved; animal is temporarily reserved. Not accepting new applications.
-  
+
   // for the outcome process
   ARCHIVED // Profile is no longer public (e.g., animal adopted, transferred, or otherwise unavailable) and is kept for records.
 }
@@ -549,9 +548,7 @@ model AdoptionApplication {
   @@index([animalId])
   @@index([userId])
   @@index([status])
-
   @@index([animalId, status]) // For quickly finding applications for an animal in a certain status
-
   @@map(name: "adoption_applications")
 }
 

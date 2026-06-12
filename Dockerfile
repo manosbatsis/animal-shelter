@@ -13,11 +13,10 @@ ENV DATABASE_URL=$DATABASE_URL
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci
-# Copy prisma directory and generate prisma client
 COPY prisma ./prisma/
 COPY prisma.config.ts ./prisma.config.ts
-RUN npx prisma generate
+# Post-script will run prisma generate after the dependencies are installed
+RUN npm ci
 
 # Development image, copy all the files
 FROM base AS runner

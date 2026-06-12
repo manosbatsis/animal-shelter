@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { main } from "@/prisma/seed";
 import { isDemo } from "@/lib/flags";
-
-const prisma = new PrismaClient();
+import {prisma} from "@/app/lib/prisma";
 
 export async function GET(request: Request) {
   // Hard exit if not a demo environment

@@ -13,6 +13,7 @@
     "lint": "eslint",
     "db": "npx prisma generate && npx prisma db push && npx prisma db seed",
     "db:reset": "npx prisma migrate reset --force",
+    "postinstall": "npm run prisma:generate",
     "prisma:push": "dotenv -e .env.local -e .env.development -- npx prisma db push",
     "prisma:generate": "dotenv -e .env.local -e .env.development -- npx prisma generate",
     "prisma:studio": "dotenv -e .env.local -e .env.development -- npx prisma studio"

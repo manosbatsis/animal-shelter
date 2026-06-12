@@ -12,7 +12,7 @@ services:
         context: .
         # Used while building the docker image for Prisma generation etc.
         args:
-          - BUILD_DATABASE_URL=${BUILD_DATABASE_URL}
+          - DATABASE_URL=${DATABASE_URL}
     ports:
       - "3000:3000"
     depends_on:

@@ -45,14 +45,9 @@ const buildDatabaseUrl = () => {
 export const E2E_DATABASE_URL =
   process.env.PLAYWRIGHT_DATABASE_URL ?? buildDatabaseUrl();
 
-console.log("E2E_DATABASE_URL:", E2E_DATABASE_URL);
-console.log("buildDatabaseUrl:", buildDatabaseUrl());
-
 export const getPlaywrightEnv = (): NodeJS.ProcessEnv => {
   const authSecret = process.env.AUTH_SECRET;
   const adminPassword = process.env.ADMIN_PASSWORD;
-  console.log("getPlaywrightEnv, authSecret:", authSecret);
-  console.log("getPlaywrightEnv, adminPassword:", adminPassword);
 
   if (!authSecret) {
     throw new Error(

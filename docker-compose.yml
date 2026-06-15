@@ -6,10 +6,14 @@ services:
     ports:
       - "5432:5432"
   nextjs:
-    build: .
-    ports:
-      - "3000:3000"
     env_file:
       - .env
+    build:
+        context: .
+        # Used while building the docker image for Prisma generation etc.
+        args:
+          - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "3000:3000"
     depends_on:
       - postgres

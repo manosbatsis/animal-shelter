@@ -20,13 +20,19 @@ import {
   FieldType,
   OutcomeType,
 } from "@prisma/client";
-const prisma = new PrismaClient();
 import { isDemo } from "@/lib/flags";
 import {
   getRandomDate,
   getRandomDateWithinLastDays,
   getRandomItem,
 } from "@/app/lib/utils/seeding-utils";
+import {env} from "prisma/config";
+import {PrismaPg} from "@prisma/adapter-pg";
+
+const connectionString = `${process.env.DATABASE_URL ?? env("DATABASE_URL")}`;
+const adapter = new PrismaPg({ connectionString });
+const prisma = new PrismaClient({ adapter });
+
 
 // =================================================================//
 //                             MOCK DATA                            //

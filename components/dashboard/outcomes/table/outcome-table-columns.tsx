@@ -20,7 +20,7 @@ export const columns: ColumnDef<OutcomeWithDetails>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="translate-y-[2px]"
+        className="translate-y-0.5"
       />
     ),
     cell: ({ row }) => (
@@ -28,7 +28,7 @@ export const columns: ColumnDef<OutcomeWithDetails>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="translate-y-[2px]"
+        className="translate-y-0.5"
       />
     ),
     enableSorting: false,
@@ -56,7 +56,7 @@ export const columns: ColumnDef<OutcomeWithDetails>[] = [
       <DataTableColumnHeader column={column} title="Recipient" />
     ),
     cell: ({ row }) => (
-      <span className="max-w-[500px] truncate font-medium">
+      <span className="max-w-125 truncate font-medium">
         {row.getValue("recipient") || "N/A"}
       </span>
     ),
@@ -68,7 +68,7 @@ export const columns: ColumnDef<OutcomeWithDetails>[] = [
     ),
     cell: ({ row }) => {
       const outcomeType = OutcomeTypesOptions.find(
-        (type) => type.value === row.getValue("type")
+        (type) => type.value === row.getValue("type"),
       );
 
       if (!outcomeType) {
@@ -83,6 +83,7 @@ export const columns: ColumnDef<OutcomeWithDetails>[] = [
         TRANSFER_OUT: "secondary",
         RETURN_TO_OWNER: "outline",
         DECEASED: "destructive",
+        EUTHANIZED: "destructive",
       };
 
       const variant = variantMap[outcomeType.value] || "secondary";

@@ -15,6 +15,7 @@
     "e2e:headed": "playwright test --headed",
     "e2e:ui": "playwright test --ui",
     "e2e:install": "playwright install chromium",
+    "typecheck": "tsc --noEmit",
     "db": "prisma generate && prisma db push && prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "postinstall": "npm run prisma:generate",

@@ -28,7 +28,7 @@ export interface GetColumnsProps {
   assigneeList: TaskAssignee[];
 }
 
-export const getColumns = ({
+export const getTaskColumns = ({
   assigneeList,
 }: GetColumnsProps): ColumnDef<TaskAnalyticsPayload>[] => [
   {
@@ -41,7 +41,7 @@ export const getColumns = ({
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="translate-y-[2px]"
+        className="translate-y-0.5"
       />
     ),
     cell: ({ row }) => (
@@ -49,7 +49,7 @@ export const getColumns = ({
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="translate-y-[2px]"
+        className="translate-y-0.5"
       />
     ),
     enableSorting: false,
@@ -62,13 +62,13 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const priority = priorities.find(
-        (priority) => priority.value === row.original.priority
+        (priority) => priority.value === row.original.priority,
       );
 
       return (
         <div className="flex space-x-2">
           {priority && <Badge variant="outline">{priority.label}</Badge>}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-125 truncate font-medium">
             {row.getValue("title")}
           </span>
         </div>
@@ -100,7 +100,7 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const status = statuses.find(
-        (status) => status.value === row.getValue("status")
+        (status) => status.value === row.getValue("status"),
       );
 
       if (!status) {
@@ -127,7 +127,7 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const category = categories.find(
-        (category) => category.value === row.getValue("category")
+        (category) => category.value === row.getValue("category"),
       );
 
       return category ? (
@@ -150,7 +150,7 @@ export const getColumns = ({
     ),
     cell: ({ row }) => {
       const priority = priorities.find(
-        (priority) => priority.value === row.getValue("priority")
+        (priority) => priority.value === row.getValue("priority"),
       );
 
       if (!priority) {
@@ -182,7 +182,7 @@ export const getColumns = ({
       const handleAssigneeChange = async (newAssigneeId: string) => {
         const result = await updateAnimalTaskAssignee(
           task.id,
-          newAssigneeId === "unassigned" ? null : newAssigneeId
+          newAssigneeId === "unassigned" ? null : newAssigneeId,
         );
 
         if (!result.success) {
@@ -194,7 +194,7 @@ export const getColumns = ({
 
       return (
         <Select value={currentAssigneeId} onValueChange={handleAssigneeChange}>
-          <SelectTrigger className="w-full max-w-[180px]">
+          <SelectTrigger className="w-full max-w-45">
             <SelectValue placeholder="Assign..." />
           </SelectTrigger>
           <SelectContent>

@@ -1,6 +1,6 @@
-import { Permissions } from "@/app/lib/auth/permissions";
+import { Permissions, type Permission } from "@/app/lib/auth/permissions";
 
-export type IconName = 
+export type IconName =
   | "IconDashboard"
   | "IconListDetails"
   | "IconUsers"
@@ -15,18 +15,27 @@ export type IconName =
   | "IconReport"
   | "IconFileWord"
   | "IconCirclePlus"
-  | "IconChartBar";
+  | "IconFolder"
+  | "IconChartBar"
+  | "IconDashboard"
+  | "IconListDetails"
+  | "IconUsers"
+  | "IconUsersGroup"
+  | "IconHeartHandshake"
+  | "IconFileText"
+  | "IconChecks"
+  | "IconCheckbox"
 
 export interface NavItem {
   title: string;
   url: string;
   icon: IconName;
-  permission?: string;
+  permission?: Permission;
   isActive?: boolean;
   items?: Array<{
     title: string;
     url: string;
-    permission?: string;
+    permission?: Permission;
   }>;
 }
 
@@ -34,7 +43,7 @@ export interface NavDocument {
   name: string;
   url: string;
   icon: IconName;
-  permission?: string;
+  permission?: Permission;
 }
 
 // Main navigation items
@@ -52,34 +61,40 @@ export const navMainItems: readonly NavItem[] = [
     permission: Permissions.ANIMAL_READ_LISTING,
   },
   {
-    title: "Users",
-    url: "/dashboard/users",
+    title: "Role Management",
+    url: "/dashboard/role-management",
     icon: "IconChartBar",
     permission: Permissions.MANAGE_ROLES,
   },
   {
+    title: "People Directory",
+    url: "/dashboard/people-directory",
+    icon: "IconUsersGroup",
+    permission: Permissions.PERSONS_READ_LISTING,
+  },
+  {
     title: "My Applications",
     url: "/dashboard/my-applications",
-    icon: "IconFolder",
+    icon: "IconFileText",
     permission: Permissions.MY_APPLICATIONS_READ,
   },
   {
     title: "Adoption Applications",
     url: "/dashboard/adoption-applications",
-    icon: "IconUsers",
+    icon: "IconHeartHandshake",
     permission: Permissions.APPLICATIONS_READ_LISTING,
   },
   {
     title: "Outcomes",
     url: "/dashboard/outcomes",
-    icon: "IconUsers",
+    icon: "IconChecks",
     permission: Permissions.OUTCOMES_MANAGE,
   },
   {
     title: "Animal Tasks",
     url: "/dashboard/animal-tasks",
-    icon: "IconUsers",
-    permission: Permissions.OUTCOMES_MANAGE,
+    icon: "IconCheckbox",
+    permission: Permissions.ANIMAL_TASK_READ_LISTING,
   },
 ] as const;
 
